@@ -2,7 +2,7 @@ import boto3
 import io
 import os
 import requests
-from subprocess import Popen, PIPE
+from subprocess import run, PIPE
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from threading import Thread
@@ -45,16 +45,12 @@ def transcode(inputObject, webhook):
 
     print(f'Running {command}', flush=True)
 
-    p = Popen(command,
-              stderr=PIPE,
-              shell=True)
+    # Have to run in a shell to make this work in a worker thread
+    cp = run(command, shell=True)
 
-    p.wait()
+    print(f'Exit status {cp.returncode}')
 
-    print(io.TextIOWrapper(p.stderr).read())
-    print(f'Exit status {p.returncode}')
-
-    if p.returncode == 0:
+    if cp.returncode == 0:
         output_key = os.path.splitext(input_key)[0]+'.mp4'
 
         print(f'Uploading {output_file} to s3://{bucket_name}/{output_key}')
