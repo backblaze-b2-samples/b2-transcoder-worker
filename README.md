@@ -1,8 +1,8 @@
 # B2 Transcoder Worker
 
-The Backblaze B2 Transcoder Proof-of-Concept comprises this lightweight Flask worker app and a web app implemented with Django and JavaScript. Together, they implement a simple video hosting site. 
+The [Backblaze B2](https://www.backblaze.com/b2/cloud-storage.html) Transcoder Proof-of-Concept comprises this lightweight [Flask](https://palletsprojects.com/p/flask/) worker app and a web app implemented with [Django](https://www.djangoproject.com) with a JavaScript front end. Together, they implement a simple video hosting site. 
 
-See the B2 Transcoder Web App for for an explanation of how the two apps interoperate.
+See the [B2 Transcoder Web App](https://github.com/Backblaze-B2-Samples/b2-transcoder-web-app) for for an explanation of how the two apps interoperate.
 
 ## Prerequisites
 
@@ -23,14 +23,14 @@ See the B2 Transcoder Web App for for an explanation of how the two apps interop
     B2_ENDPOINT_URL="<for example: https://s3.us-west-001.backblazeb2.com>"
     B2_APPLICATION_KEY_ID="<your B2 application key ID>"
     B2_APPLICATION_KEY="<your B2 application key>"
-    BUCKET_NAME="<your B2 bucket>"
+    BUCKET_NAME="<your private B2 bucket, for uploaded videos>"
     ```
 
 ## Run the Worker App
 
 * `flask run` to run the app in the Flask development server.
 
-    You may change the interface and port to which the app binds with the `-h/--host` and `-p/--port` options. For example, to listen on the standard HTTP port on all interfaces, you would use:
+    You may change the interface and port to which the worker app binds with the `-h/--host` and `-p/--port` options. For example, to listen on the standard HTTP port on all interfaces, you would use:
 
     ```bash
     flask run -h 0.0.0.0 -p 80
@@ -47,5 +47,12 @@ See the B2 Transcoder Web App for for an explanation of how the two apps interop
     ```
 
 * Run the web app.
+
+## Caveats
+
+Note that this is a proof-of-concept system! To run a similar system in production, you would need to make several changes, including:
+
+* Using a message queue such as [Apache Kafka](https://kafka.apache.org) or [RabbitMQ](https://www.rabbitmq.com) rather than HTTP POST notifications.
+* Running the apps from a WSGI server such as [Green Unicorn](http://gunicorn.org/) or [Apache Web Server](https://httpd.apache.org) with [`mod_wsgi`](https://github.com/GrahamDumpleton/mod_wsgi).
 
 Feel free to fork this repository and submit a pull request if you make an interesting change!
