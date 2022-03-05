@@ -15,7 +15,7 @@ load_dotenv()
 
 # Obtain B2 S3 compatible client
 s3 = boto3.client(service_name='s3',
-                  endpoint_url=os.environ['B2_ENDPOINT'],
+                  endpoint_url=os.environ['B2_ENDPOINT_URL'],
                   aws_access_key_id=os.environ['B2_APPLICATION_KEY_ID'],
                   aws_secret_access_key=os.environ['B2_APPLICATION_KEY'])
 
