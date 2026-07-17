@@ -20,11 +20,14 @@ See the [B2 Transcoder Web App](https://github.com/Backblaze-B2-Samples/b2-trans
 * Create a `.env` file or set environment variables with your configuration:
 
     ```bash
-    B2_ENDPOINT_URL="<for example: https://s3.us-west-001.backblazeb2.com>"
     B2_APPLICATION_KEY_ID="<your B2 application key ID>"
     B2_APPLICATION_KEY="<your B2 application key>"
-    BUCKET_NAME="<your private B2 bucket, for uploaded videos>"
+    B2_BUCKET_NAME="<your private B2 bucket, for uploaded videos>"
+    B2_REGION="<for example: us-west-001>"
+    B2_PUBLIC_URL_BASE="<reserved by the shared B2 sample env contract; this worker does not read it>"
     ```
+
+    The worker derives its S3 endpoint from `B2_REGION` as `https://s3.<region>.backblazeb2.com`; it does not read a `B2_ENDPOINT_URL` override. Non-standard S3 endpoint hosts are intentionally unsupported by this proof-of-concept worker. When migrating an existing deployment from the previous variable names, set both `B2_REGION` and the old `B2_ENDPOINT_URL`, and both `B2_BUCKET_NAME` and the old `BUCKET_NAME`, until all old worker processes have been drained. After that, remove the old names.
 
 ## Run the Worker App
 

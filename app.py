@@ -1,7 +1,9 @@
 import boto3
 import io
 import os
+import re
 import requests
+from botocore.config import Config
 from subprocess import run, PIPE
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
@@ -13,13 +15,40 @@ from tempfile import mkdtemp
 from dotenv import load_dotenv
 load_dotenv()
 
-# Obtain B2 S3 compatible client
-s3 = boto3.client(service_name='s3',
-                  endpoint_url=os.environ['B2_ENDPOINT_URL'],
-                  aws_access_key_id=os.environ['B2_APPLICATION_KEY_ID'],
-                  aws_secret_access_key=os.environ['B2_APPLICATION_KEY'])
 
-bucket_name = os.environ['BUCKET_NAME']
+B2_REGION_PATTERN = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*-\d{3}$')
+
+
+def required_env(name):
+    value = os.environ.get(name)
+    if not value:
+        raise SystemExit(f'{name} is required (see .env.example)')
+    return value
+
+
+def validated_b2_region():
+    region = required_env('B2_REGION')
+    if not B2_REGION_PATTERN.fullmatch(region):
+        raise SystemExit(
+            'B2_REGION must be a Backblaze region token like us-west-001 '
+            '(see .env.example)'
+        )
+    return region
+
+
+# Obtain B2 S3 compatible client
+B2_REGION = validated_b2_region()
+
+s3 = boto3.client(service_name='s3',
+                  endpoint_url=f'https://s3.{B2_REGION}.backblazeb2.com',
+                  region_name=B2_REGION,
+                  aws_access_key_id=required_env('B2_APPLICATION_KEY_ID'),
+                  aws_secret_access_key=required_env('B2_APPLICATION_KEY'),
+                  config=Config(
+                      user_agent_extra='b2-transcoder-worker (backblaze-b2-samples)'
+                  ))
+
+bucket_name = required_env('B2_BUCKET_NAME')
 
 app = Flask(__name__)
 api = Api(app)
@@ -54,7 +83,7 @@ def transcode(inputObject, webhook):
         output_key = os.path.splitext(input_key)[0]+'.mp4'
 
         print(f'Uploading {output_file} to s3://{bucket_name}/{output_key}')
-        s3.upload_file(output_file, os.environ['BUCKET_NAME'], output_key)
+        s3.upload_file(output_file, bucket_name, output_key)
 
         response = {
             'status': 'success',
