@@ -20,10 +20,11 @@ See the [B2 Transcoder Web App](https://github.com/Backblaze-B2-Samples/b2-trans
 * Create a `.env` file or set environment variables with your configuration:
 
     ```bash
-    B2_ENDPOINT_URL="<for example: https://s3.us-west-001.backblazeb2.com>"
     B2_APPLICATION_KEY_ID="<your B2 application key ID>"
     B2_APPLICATION_KEY="<your B2 application key>"
-    BUCKET_NAME="<your private B2 bucket, for uploaded videos>"
+    B2_BUCKET_NAME="<your private B2 bucket, for uploaded videos>"
+    B2_REGION="<for example: us-west-001>"
+    B2_PUBLIC_URL_BASE="<for example: https://f000.backblazeb2.com/file/your-bucket>"
     ```
 
 ## Run the Worker App
